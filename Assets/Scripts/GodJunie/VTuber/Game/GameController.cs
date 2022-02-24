@@ -4,6 +4,7 @@
  * 내용 : 
  */
 
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,6 +12,9 @@ using UnityEngine;
 using Sirenix.OdinInspector;
 using DG.Tweening;
 using UnityEngine.UI;
+using Cysharp.Threading.Tasks;
+
+using Random = UnityEngine.Random;
 
 namespace GodJunie.VTuber.Game {
     public class GameController : MonoBehaviour {
@@ -102,14 +106,14 @@ namespace GodJunie.VTuber.Game {
 
         // Update is called once per frame
         void Update() {
-            if(isPlaying) {
-                generateTimer -= Time.deltaTime;
-                if(generateTimer < 0) {
-                    // Generate Chat
-                    for(int i = 0; i < Random.Range(minCount,maxCount) ; i++) {
-                        GenerateChat();
-                    }
-                    generateTimer = Random.Range(minInterval, maxInterval);
+        
+        }
+
+        private async void GenerateChatAsync() {
+            while(isPlaying) {
+                await UniTask.Delay(TimeSpan.FromSeconds(Random.Range(minInterval, maxInterval)));
+                for(int i = 0; i < Random.Range(minCount, maxCount); i++) {
+                    GenerateChat();
                 }
             }
         }
@@ -123,6 +127,7 @@ namespace GodJunie.VTuber.Game {
         public void GameStart() {
             isPlaying = true;
             panelGameStart.SetActive(false);
+            GenerateChatAsync();
         }
 
         private void OnGameEnd() {

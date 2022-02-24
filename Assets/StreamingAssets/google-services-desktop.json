@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "299803721159",
+    "firebase_url": "https://vtuber-simulator-682ff-default-rtdb.firebaseio.com",
+    "project_id": "vtuber-simulator-682ff",
+    "storage_bucket": "vtuber-simulator-682ff.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:299803721159:android:7519ad51ceee57b5332de2",
+        "android_client_info": {
+          "package_name": "com.b409.vtuber"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "299803721159-7dgc4kguuectjtqvl0ool0idti4c4qnc.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.b409.vtuber",
+            "certificate_hash": "8bbefda85430381001bd76cb47f45e877d26a007"
+          }
+        },
+        {
+          "client_id": "299803721159-jr78i0mgbiuaunot8t5hlld7o7gninib.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDGfkN0g7oKT1FHUTuCCc-CsLYwMzlL-Ww"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "299803721159-jr78i0mgbiuaunot8t5hlld7o7gninib.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
