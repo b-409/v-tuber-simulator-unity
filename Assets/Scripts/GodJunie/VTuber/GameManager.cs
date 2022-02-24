@@ -111,7 +111,9 @@ namespace GodJunie.VTuber {
             await auth.SignInAnonymouslyAsync();
         }
 
-        public void SignInWithGoogle() {
+        public async Task<bool> SignInWithGoogle() {
+            var source = new TaskCompletionSource<bool>();
+            
             PlayGamesClientConfiguration config = new PlayGamesClientConfiguration.Builder()
                 .RequestIdToken()
                 .Build();
@@ -126,11 +128,16 @@ namespace GodJunie.VTuber {
 
                     Credential credential = GoogleAuthProvider.GetCredential(idToken, null);
                     await auth.SignInWithCredentialAsync(credential);
+                    source.SetResult(true);
+                } else {
+                    source.SetResult(false);
                 }
             });
+
+            return await source.Task;
         }
 
-        public async Task SignInWithFacebook() {
+        public async Task<bool> SignInWithFacebook() {
             var credentialSource = new TaskCompletionSource<Credential>();
 
             var perms = new List<string>() { "public_profile", "email" };
@@ -149,12 +156,22 @@ namespace GodJunie.VTuber {
                     credentialSource.SetResult(credential);
                 } else {
                     Debug.Log("User cancelled login");
+                    credentialSource.SetResult(null);
                 }
             });
 
             var credential = await credentialSource.Task;
 
-            await auth.SignInWithCredentialAsync(credential);
+            if(credential == null) {
+                return false;
+            }
+
+            var user = await auth.SignInWithCredentialAsync(credential);
+
+            if(user != null)
+                return true;
+            else
+                return false;
         }
 
         private async UniTask<Credential> WaitFacebookTokenAsync(AccessToken aToken) {
