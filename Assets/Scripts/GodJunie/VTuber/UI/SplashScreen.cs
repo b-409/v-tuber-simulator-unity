@@ -17,7 +17,6 @@ namespace GodJunie.VTuber.UI {
             if(Application.version != latestVersion) {
                 // 버전이 다름!
                 // 스토어로 ㄱㄱ
-
                 return;
             }
 
@@ -30,8 +29,16 @@ namespace GodJunie.VTuber.UI {
 
             // 리소스 상태가 최신인가?
             // Addressable Asset Management System
+            long size = await ResourcesManager.Instance.GetDownloadSizeAsync("default");
+            if(size > 0) {
+                // 받아야 하는 리소스가 있다
+                // 다운로드 확인 화면 띄워주기
+
+                return;
+            }
 
             // 개인정보제공동의를 했는가?
+            // TODO: 개인정보제공동의 제작
 
             // 로그인 캐시가 있는가?
             if(GameManager.Instance.IsAuthenticated) {
