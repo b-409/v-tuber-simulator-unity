@@ -33,7 +33,6 @@ namespace GodJunie.VTuber.UI {
             if(size > 0) {
                 // 받아야 하는 리소스가 있다
                 // 다운로드 확인 화면 띄워주기
-
                 return;
             }
 

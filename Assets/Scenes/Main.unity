@@ -473,7 +473,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &555575479
 RectTransform:
   m_ObjectHideFlags: 0
@@ -561,10 +561,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ba7dc243e183b0d42a305db7a59b7524, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  minCount: 2
-  maxCount: 4
-  minInterval: 0.2
-  maxInterval: 0.3
+  minCount: 1
+  maxCount: 1
+  minInterval: 0.5
+  maxInterval: 0.5
   goal: 300
   settings: {fileID: 11400000, guid: ab10ba263dfb45e40888bfa6331a075a, type: 2}
   panelGameStart: {fileID: 555575478}
