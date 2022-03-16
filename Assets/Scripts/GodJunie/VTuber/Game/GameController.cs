@@ -51,6 +51,19 @@ namespace GodJunie.VTuber.Game {
         [SerializeField]
         private Data.ChatSettings settings;
 
+        [BoxGroup("group/Settings/호감도 게이지")]
+        [LabelText("초기 값")]
+        [SerializeField]
+        private float gaugeStart;
+        [BoxGroup("group/Settings/호감도 게이지")]
+        [LabelText("최대 값")]
+        [SerializeField]
+        private float gaugeMax;
+        [BoxGroup("group/Settings/호감도 게이지")]
+        [LabelText("게이지 감소량 (초당)")]
+        [SerializeField]
+        private float gaugePerSecond;
+
         // Obejcts
         // Game Start Menu
         [TabGroup("group", "Objects")]
@@ -77,7 +90,11 @@ namespace GodJunie.VTuber.Game {
         [SerializeField]
         [LabelText("코인 텍스트")]
         private Text textGold;
-        
+        [TitleGroup("group/Objects/UI")]
+        [SerializeField]
+        [LabelText("게이지 이미지")]
+        private Image imageGauge;
+
         #endregion
 
         #region Private Members
@@ -87,6 +104,8 @@ namespace GodJunie.VTuber.Game {
         private int subscribers;
         // 획득 골드
         private int gold;
+        // 호감도 게이지
+        private float gauge;
 
         private bool isPlaying;
 
@@ -106,7 +125,9 @@ namespace GodJunie.VTuber.Game {
 
         // Update is called once per frame
         void Update() {
-        
+            if(isPlaying) {
+                UpdateGauge(-gaugePerSecond * Time.deltaTime);
+            }
         }
 
         private async void GenerateChatAsync() {
@@ -126,6 +147,7 @@ namespace GodJunie.VTuber.Game {
 
         public void GameStart() {
             isPlaying = true;
+            this.gauge = gaugeStart;
             panelGameStart.SetActive(false);
             GenerateChatAsync();
         }
@@ -151,6 +173,7 @@ namespace GodJunie.VTuber.Game {
             chat.Init(text, chatProperties, () => {
                 this.gold += chatProperties.Gold;
                 this.subscribers += chatProperties.Subscribers;
+                UpdateGauge(chatProperties.Gauge);
 
                 SetUI();
 
@@ -164,6 +187,14 @@ namespace GodJunie.VTuber.Game {
                 // 활성화된 채팅 수가 카운트를 넘어감
                 // 가장 처음에 활성화된 애를 비활성화 해야함
                 chatsPool.Where(e => e.gameObject.activeSelf).OrderBy(e => e.transform.GetSiblingIndex()).Last().gameObject.SetActive(false);
+            }
+        }
+
+        private void UpdateGauge(float gauge) {
+            this.gauge = Mathf.Clamp(this.gauge + gauge, 0, gaugeMax);
+            imageGauge.fillAmount = this.gauge / this.gaugeMax;
+            if(this.gauge <= 0f) {
+                OnGameEnd();
             }
         }
     }

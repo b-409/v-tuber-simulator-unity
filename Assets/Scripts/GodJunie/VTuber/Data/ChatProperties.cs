@@ -30,6 +30,10 @@ namespace GodJunie.VTuber.Data {
         [HideLabel]
         [SerializeField]
         private int subscribers;
+        [BoxGroup("group/속성/group/획득 게이지")]
+        [HideLabel]
+        [SerializeField]
+        private float gauge;
         [BoxGroup("group/속성/group/터치 타입")]
         [HideLabel]
         [SerializeField]
@@ -39,6 +43,7 @@ namespace GodJunie.VTuber.Data {
         public float Probs { get => probs; }
         public int Gold { get => gold; }
         public int Subscribers { get => subscribers; }
+        public float Gauge { get => gauge; }
         public ChatTouchType TouchType { get => touchType; }
     }
 

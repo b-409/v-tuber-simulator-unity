@@ -17,19 +17,23 @@ MonoBehaviour:
     probs: 10000
     gold: 1
     subscribers: 0
+    gauge: 5
     touchType: 1
   - backgroundColor: {r: 0, g: 0.4592929, b: 1, a: 1}
     probs: 2179
     gold: 5
     subscribers: 5
-    touchType: 2
+    gauge: 10
+    touchType: 1
   - backgroundColor: {r: 1, g: 0.11065744, b: 0, a: 1}
     probs: 973
     gold: 10
     subscribers: 10
-    touchType: 2
+    gauge: 50
+    touchType: 1
   - backgroundColor: {r: 0, g: 0, b: 0, a: 1}
     probs: 350
     gold: 100
     subscribers: 100
-    touchType: 3
+    gauge: -300
+    touchType: 1

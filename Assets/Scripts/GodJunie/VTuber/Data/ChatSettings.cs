@@ -9,9 +9,6 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using Sirenix.OdinInspector;
-using Sirenix.OdinInspector.Editor;
-using Sirenix.Utilities.Editor;
-using UnityEditor;
 
 namespace GodJunie.VTuber.Data {
     public class ChatSettings : DataConfig<ChatSettings> {
