@@ -12,28 +12,39 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 75efb724ebedab0408aa7e65324f116f, type: 3}
   m_Name: ChatSettings
   m_EditorClassIdentifier: 
-  chatPropertiesList:
-  - backgroundColor: {r: 1, g: 1, b: 1, a: 1}
-    probs: 10000
-    gold: 1
-    subscribers: 0
-    gauge: 5
-    touchType: 1
-  - backgroundColor: {r: 0, g: 0.4592929, b: 1, a: 1}
-    probs: 2179
-    gold: 5
-    subscribers: 5
-    gauge: 10
-    touchType: 1
-  - backgroundColor: {r: 1, g: 0.11065744, b: 0, a: 1}
-    probs: 973
-    gold: 10
-    subscribers: 10
-    gauge: 50
-    touchType: 1
-  - backgroundColor: {r: 0, g: 0, b: 0, a: 1}
-    probs: 350
-    gold: 100
-    subscribers: 100
-    gauge: -300
-    touchType: 1
+  normalProperties:
+    backgroundColor: {r: 1, g: 1, b: 1, a: 1}
+    probs: 8681
+    goldSuccess: 0
+    subscribersSuccess: 10
+    gaugeSuccess: 50
+    goldFailed: 0
+    subscribersFailed: 0
+    gaugeFailed: -300
+  coinProperties:
+    backgroundColor: {r: 0.24056602, g: 0.6158158, b: 1, a: 1}
+    probs: 2582
+    goldSuccess: 1
+    subscribersSuccess: 5
+    gaugeSuccess: 70
+    goldFailed: 0
+    subscribersFailed: 0
+    gaugeFailed: -300
+  superProperties:
+    backgroundColor: {r: 1, g: 0.28773582, b: 0.28773582, a: 1}
+    probs: 494
+    goldSuccess: 20
+    subscribersSuccess: 1
+    gaugeSuccess: 100
+    goldFailed: 0
+    subscribersFailed: 0
+    gaugeFailed: -300
+  blackProperties:
+    backgroundColor: {r: 0, g: 0, b: 0, a: 1}
+    probs: 385
+    goldSuccess: 0
+    subscribersSuccess: 0
+    gaugeSuccess: 0
+    goldFailed: 0
+    subscribersFailed: 0
+    gaugeFailed: -300

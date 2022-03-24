@@ -17,39 +17,14 @@ using Cysharp.Threading.Tasks;
 using Random = UnityEngine.Random;
 
 namespace GodJunie.VTuber.Game {
+    using Data;
+
     public class GameController : MonoBehaviour {
         #region Serialized Members
-        // Settings Fileds
-        [TabGroup("group", "Settings")]
-        [BoxGroup("group/Settings/생성 개수")]
-        [HorizontalGroup("group/Settings/생성 개수/group", .5f)]
-        [SerializeField]
-        [LabelText("최소")]
-        private int minCount;
-        [HorizontalGroup("group/Settings/생성 개수/group", .5f)]
-        [SerializeField]
-        [LabelText("최대")]
-        private int maxCount;
-
-        [BoxGroup("group/Settings/생성 간격")]
-        [HorizontalGroup("group/Settings/생성 간격/group", .5f)]
-        [SerializeField]
-        [LabelText("최소")]
-        private float minInterval;
-        [HorizontalGroup("group/Settings/생성 간격/group", .5f)]
-        [SerializeField]
-        [LabelText("최대")]
-        private float maxInterval;
-
-        [TabGroup("group", "Settings")]
-        [SerializeField]
-        [LabelText("목표 구독자 수")]
-        private int goal;
-
         [TabGroup("group", "Settings")]
         [LabelText("설정 인스턴스")]
         [SerializeField]
-        private Data.ChatSettings settings;
+        private ChatSettings settings;
 
         [BoxGroup("group/Settings/호감도 게이지")]
         [LabelText("초기 값")]
@@ -63,6 +38,16 @@ namespace GodJunie.VTuber.Game {
         [LabelText("게이지 감소량 (초당)")]
         [SerializeField]
         private float gaugePerSecond;
+
+        [TabGroup("group", "Settings")]
+        [LabelText("채팅 개수")]
+        [SerializeField]
+        private int chatCount;
+
+        [TabGroup("group", "Settings")]
+        [LabelText("슈퍼 채팅 터치 횟수")]
+        [SerializeField]
+        private int superChatTouchCount;
 
         // Obejcts
         // Game Start Menu
@@ -94,7 +79,6 @@ namespace GodJunie.VTuber.Game {
         [SerializeField]
         [LabelText("게이지 이미지")]
         private Image imageGauge;
-
         #endregion
 
         #region Private Members
@@ -109,13 +93,15 @@ namespace GodJunie.VTuber.Game {
 
         private bool isPlaying;
 
-        private int poolCount = 10;
-        private List<ChatController> chatsPool = new List<ChatController>();
+        private List<ChatController> chats = new List<ChatController>();
+        private Dictionary<ChatType, ChatProperties> chatProperties;
+
+        private int touchCount;
         #endregion
 
         #region MonoBehaviour
         private void Awake() {
-            
+            chatProperties = settings.ChatProperties;
         }
 
         // Start is called before the first frame update
@@ -127,67 +113,36 @@ namespace GodJunie.VTuber.Game {
         void Update() {
             if(isPlaying) {
                 UpdateGauge(-gaugePerSecond * Time.deltaTime);
-            }
-        }
-
-        private async void GenerateChatAsync() {
-            while(isPlaying) {
-                await UniTask.Delay(TimeSpan.FromSeconds(Random.Range(minInterval, maxInterval)));
-                for(int i = 0; i < Random.Range(minCount, maxCount); i++) {
-                    GenerateChat();
-                }
+                KeyboardInput();
             }
         }
         #endregion
 
+        private void KeyboardInput() {
+            if(Input.GetKeyDown(KeyCode.LeftArrow)) {
+                OnTouchBlack();
+            }
+            if(Input.GetKeyDown(KeyCode.RightArrow)) {
+                OnTouchChat();
+            }
+        }
+
         private void SetUI() {
-            this.textSubscribers.text = string.Format("구독자 수\n{0}/{1}", this.subscribers, this.goal);
+            this.textSubscribers.text = string.Format("구독자 수\n{0}", this.subscribers);
             this.textGold.text = string.Format("획득 코인\n{0}개", this.gold);
         }
 
         public void GameStart() {
             isPlaying = true;
             this.gauge = gaugeStart;
+            while(chats.Count < chatCount) {
+                GenerateChat();
+            }
             panelGameStart.SetActive(false);
-            GenerateChatAsync();
         }
 
         private void OnGameEnd() {
             isPlaying = false;
-        }
-
-        private void GenerateChat() {
-            var text = "";
-
-            var chatProperties = this.settings.GetRandomChat();
-
-            // Generate new chat
-            // 1. 풀링해서 꺼낼 수 있는게 있는지 확인
-            var chat = chatsPool.Where(e => !e.gameObject.activeSelf).FirstOrDefault();
-            if(chat == default(ChatController)) {
-                // 없었음
-                chat = Instantiate(chatPrefab, chatContainer).GetComponent<ChatController>();
-                chatsPool.Add(chat);
-            }
-            // Init 하고
-            chat.Init(text, chatProperties, () => {
-                this.gold += chatProperties.Gold;
-                this.subscribers += chatProperties.Subscribers;
-                UpdateGauge(chatProperties.Gauge);
-
-                SetUI();
-
-                if(this.subscribers >= this.goal) {
-                    Debug.Log("스테이지 클리어!");
-                }
-            });
-            // 0번에다가 넣음 (가장 아래로)
-            chat.transform.SetSiblingIndex(0);
-            if(chatsPool.Count(e => e.gameObject.activeSelf) > poolCount) {
-                // 활성화된 채팅 수가 카운트를 넘어감
-                // 가장 처음에 활성화된 애를 비활성화 해야함
-                chatsPool.Where(e => e.gameObject.activeSelf).OrderBy(e => e.transform.GetSiblingIndex()).Last().gameObject.SetActive(false);
-            }
         }
 
         private void UpdateGauge(float gauge) {
@@ -195,6 +150,99 @@ namespace GodJunie.VTuber.Game {
             imageGauge.fillAmount = this.gauge / this.gaugeMax;
             if(this.gauge <= 0f) {
                 OnGameEnd();
+            }
+        }
+
+        private void GenerateChat() {
+            var rand = Random.Range(0, chatProperties.Sum(e => e.Value.Probs));
+            ChatType type = ChatType.None;
+            foreach(var pair in chatProperties) {
+                if(rand < pair.Value.Probs) {
+                    type = pair.Key;
+                    break;
+                } else {
+                    rand -= pair.Value.Probs;
+                }
+            }
+
+            if(type == ChatType.None) {
+                Debug.LogError("타입 지정 실패");
+                return;
+            }
+
+            var properties = chatProperties[type];
+
+            ChatController chat;
+            if(chats.Count < chatCount) {
+                chat = Instantiate(chatPrefab, chatContainer).GetComponent<ChatController>();
+            } else {
+                chat = chats[0];
+                chats.RemoveAt(0);
+            }
+
+            chats.Add(chat);
+            chat.Init(type, properties.BackgroundColor, "");
+            chat.transform.SetSiblingIndex(0);
+        }
+
+
+        private void OnSuccess(ChatController chat) {
+            subscribers += chatProperties[chat.ChatType].SubscribersSuccess;
+            gold += chatProperties[chat.ChatType].GoldSuccess;
+            gauge += chatProperties[chat.ChatType].GaugeSuccess;
+
+            SetUI();
+            GenerateChat();
+        }
+
+        private void OnFail(ChatController chat) {
+            subscribers += chatProperties[chat.ChatType].SubscribersFailed;
+            gold += chatProperties[chat.ChatType].GoldFailed;
+            gauge += chatProperties[chat.ChatType].GaugeFailed;
+
+            SetUI();
+            GenerateChat();
+        }
+
+
+        public void OnTouchChat() {
+            var chat = chats[0];
+
+            switch(chat.ChatType) {
+            case ChatType.Normal:
+            case ChatType.Coin:
+                // Success
+                OnSuccess(chat);
+                break;
+            case ChatType.Super:
+                touchCount++;
+                if(touchCount == superChatTouchCount) {
+                    // Success
+                    touchCount = 0;
+                    OnSuccess(chat);
+                }
+                break;
+            case ChatType.Black:
+                // Failed
+                OnFail(chat);
+                break;
+            }
+        }
+
+        public void OnTouchBlack() {
+            var chat = chats[0];
+
+            switch(chat.ChatType) {
+            case ChatType.Normal:
+            case ChatType.Coin:
+            case ChatType.Super:
+                // Success
+                OnFail(chat);
+                break;
+            case ChatType.Black:
+                // Failed
+                OnSuccess(chat);
+                break;
             }
         }
     }

@@ -9,25 +9,40 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using Sirenix.OdinInspector;
+using GodJunie.VTuber.Game;
 
 namespace GodJunie.VTuber.Data {
     public class ChatSettings : DataConfig<ChatSettings> {
-        public enum ChatTouchType : int {  None = 0, Touch, SwipeLeft, SwipeRight };
-        [LabelText("채팅 프로퍼티 리스트")]
+        [HorizontalGroup("group", .25f)]
+        [BoxGroup("group/일반 채팅")]
+        [HideLabel]
         [SerializeField]
-        [ListDrawerSettings(Expanded = true, AddCopiesLastElement = true, DraggableItems = true)]
-        private List<ChatProperties> chatPropertiesList;
+        private ChatProperties normalProperties;
+        [HorizontalGroup("group", .25f)]
+        [BoxGroup("group/코인 채팅")]
+        [HideLabel]
+        [SerializeField]
+        private ChatProperties coinProperties;
+        [HorizontalGroup("group", .25f)]
+        [BoxGroup("group/슈퍼 채팅")]
+        [HideLabel]
+        [SerializeField]
+        private ChatProperties superProperties;
+        [HorizontalGroup("group", .25f)]
+        [BoxGroup("group/블랙 채팅")]
+        [HideLabel]
+        [SerializeField]
+        private ChatProperties blackProperties;
 
-        public ChatProperties GetRandomChat() {
-            var rand = Random.Range(0, chatPropertiesList.Sum(chat => chat.Probs));
-            foreach(var chat in this.chatPropertiesList) {
-                if(rand < chat.Probs) {
-                    return chat;
-                } else {
-                    rand -= chat.Probs;
-                }
+        public Dictionary<ChatType, ChatProperties> ChatProperties {
+            get {
+                return new Dictionary<ChatType, ChatProperties> {
+                    { ChatType.Normal, this.normalProperties },
+                    { ChatType.Coin, this.coinProperties },
+                    { ChatType.Super, this.superProperties },
+                    { ChatType.Black, this.blackProperties },
+                };
             }
-            return null;
         }
     }
 }

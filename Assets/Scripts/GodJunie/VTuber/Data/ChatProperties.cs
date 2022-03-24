@@ -1,4 +1,4 @@
-using Sirenix.OdinInspector;
+ï»¿using Sirenix.OdinInspector;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -8,43 +8,57 @@ namespace GodJunie.VTuber.Data {
 
     [System.Serializable]
     public class ChatProperties {
-        [BoxGroup("¹è°æ»ö")]
+        [VerticalGroup("group")]
+        [BoxGroup("group/ë°°ê²½ìƒ‰")]
         [SerializeField]
         [HideLabel]
         [ColorUsage(true)]
         private Color backgroundColor;
 
-        [HorizontalGroup("group")]
-        [BoxGroup("group/¼Ó¼º")]
-        [HorizontalGroup("group/¼Ó¼º/group")]
-        [BoxGroup("group/¼Ó¼º/group/È®·ü (Áß·®)")]
+        [BoxGroup("group/í™•ë¥  (ì¤‘ëŸ‰)")]
         [HideLabel]
         [SerializeField]
         [PropertyRange(0, 10000)]
         private float probs;
-        [BoxGroup("group/¼Ó¼º/group/È¹µæ ÄÚÀÎ")]
+
+        [HorizontalGroup("group/group", .5f)]
+        [BoxGroup("group/group/ì„±ê³µ ì‹œ")]
+        [BoxGroup("group/group/ì„±ê³µ ì‹œ/íšë“ ê³¨ë“œ")]
         [HideLabel]
         [SerializeField]
-        private int gold;
-        [BoxGroup("group/¼Ó¼º/group/È¹µæ ±¸µ¶ÀÚ")]
+        private int goldSuccess;
+        [BoxGroup("group/group/ì„±ê³µ ì‹œ/íšë“ êµ¬ë…ìž")]
         [HideLabel]
         [SerializeField]
-        private int subscribers;
-        [BoxGroup("group/¼Ó¼º/group/È¹µæ °ÔÀÌÁö")]
+        private int subscribersSuccess;
+        [BoxGroup("group/group/ì„±ê³µ ì‹œ/íšë“ ê²Œì´ì§€")]
         [HideLabel]
         [SerializeField]
-        private float gauge;
-        [BoxGroup("group/¼Ó¼º/group/ÅÍÄ¡ Å¸ÀÔ")]
+        private float gaugeSuccess;
+
+        [HorizontalGroup("group/group", .5f)]
+        [BoxGroup("group/group/ì‹¤íŒ¨ ì‹œ")]
+        [BoxGroup("group/group/ì‹¤íŒ¨ ì‹œ/ì°¨ê° ê³¨ë“œ")]
         [HideLabel]
         [SerializeField]
-        private ChatTouchType touchType;
+        private int goldFailed;
+        [BoxGroup("group/group/ì‹¤íŒ¨ ì‹œ/ì°¨ê° êµ¬ë…ìž")]
+        [HideLabel]
+        [SerializeField]
+        private int subscribersFailed;
+        [BoxGroup("group/group/ì‹¤íŒ¨ ì‹œ/ì°¨ê° ê²Œì´ì§€")]
+        [HideLabel]
+        [SerializeField]
+        private float gaugeFailed;
+
 
         public Color BackgroundColor { get => backgroundColor; }
         public float Probs { get => probs; }
-        public int Gold { get => gold; }
-        public int Subscribers { get => subscribers; }
-        public float Gauge { get => gauge; }
-        public ChatTouchType TouchType { get => touchType; }
+        public int GoldSuccess { get => goldSuccess; }
+        public int SubscribersSuccess { get => subscribersSuccess; }
+        public float GaugeSuccess { get => gaugeSuccess; }
+        public int GoldFailed { get => goldFailed; }
+        public int SubscribersFailed { get => subscribersFailed; }
+        public float GaugeFailed { get => gaugeFailed; }
     }
-
 }

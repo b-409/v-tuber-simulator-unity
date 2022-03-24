@@ -1,57 +1,57 @@
-using System.Collections;
+ï»¿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Sirenix.OdinInspector;
 
 namespace GodJunie.VTuber.UI {
     public class SplashScreen : MonoBehaviour {
-        [TitleGroup("UI ¿ÀºêÁ§Æ®")]
-        [LabelText("·Î±×ÀÎ È­¸é")]
+        [TitleGroup("UI ì˜¤ë¸Œì íŠ¸")]
+        [LabelText("ë¡œê·¸ì¸ í™”ë©´")]
         [SerializeField]
         private GameObject panelAuth;
 
         // Start is called before the first frame update
         private async void Start() {
-            // Å¬¶óÀÌ¾ðÆ®°¡ ÃÖ½Å ¹öÀüÀÎ°¡?
+            // í´ë¼ì´ì–¸íŠ¸ê°€ ìµœì‹  ë²„ì „ì¸ê°€?
             string latestVersion = await GameManager.Instance.GetLatestVersionAsync();
             if(Application.version != latestVersion) {
-                // ¹öÀüÀÌ ´Ù¸§!
-                // ½ºÅä¾î·Î ¤¡¤¡
+                // ë²„ì „ì´ ë‹¤ë¦„!
+                // ìŠ¤í† ì–´ë¡œ ã„±ã„±
                 return;
             }
 
-            // ¼­¹ö°¡ Á¡°ËÁßÀÎ°¡?
+            // ì„œë²„ê°€ ì ê²€ì¤‘ì¸ê°€?
             string serverState = await GameManager.Instance.GetServerStateAsync();
             if(serverState == "maintaining") {
-                // ÇöÀç ¼­¹ö°¡ Á¡°Ë Áß
+                // í˜„ìž¬ ì„œë²„ê°€ ì ê²€ ì¤‘
                 return;
             }
 
-            // ¸®¼Ò½º »óÅÂ°¡ ÃÖ½ÅÀÎ°¡?
+            // ë¦¬ì†ŒìŠ¤ ìƒíƒœê°€ ìµœì‹ ì¸ê°€?
             // Addressable Asset Management System
             long size = await ResourcesManager.Instance.GetDownloadSizeAsync("default");
             if(size > 0) {
-                // ¹Þ¾Æ¾ß ÇÏ´Â ¸®¼Ò½º°¡ ÀÖ´Ù
-                // ´Ù¿î·Îµå È®ÀÎ È­¸é ¶ç¿öÁÖ±â
+                // ë°›ì•„ì•¼ í•˜ëŠ” ë¦¬ì†ŒìŠ¤ê°€ ìžˆë‹¤
+                // ë‹¤ìš´ë¡œë“œ í™•ì¸ í™”ë©´ ë„ì›Œì£¼ê¸°
                 return;
             }
 
-            // °³ÀÎÁ¤º¸Á¦°øµ¿ÀÇ¸¦ Çß´Â°¡?
-            // TODO: °³ÀÎÁ¤º¸Á¦°øµ¿ÀÇ Á¦ÀÛ
+            // ê°œì¸ì •ë³´ì œê³µë™ì˜ë¥¼ í–ˆëŠ”ê°€?
+            // TODO: ê°œì¸ì •ë³´ì œê³µë™ì˜ ì œìž‘
 
-            // ·Î±×ÀÎ Ä³½Ã°¡ ÀÖ´Â°¡?
+            // ë¡œê·¸ì¸ ìºì‹œê°€ ìžˆëŠ”ê°€?
             if(GameManager.Instance.IsAuthenticated) {
-                // ·Î±×ÀÎ Ä³½Ã°¡ ÀÖÀ½ (auth ¿¡ Instance ÇÒ´çÇÏ¸é¼­ ÀÚµ¿À¸·Î Ä³½Ã ÀÖÀ¸¸é ·Î±×ÀÎ µÊ)
+                // ë¡œê·¸ì¸ ìºì‹œê°€ ìžˆìŒ (auth ì— Instance í• ë‹¹í•˜ë©´ì„œ ìžë™ìœ¼ë¡œ ìºì‹œ ìžˆìœ¼ë©´ ë¡œê·¸ì¸ ë¨)
 
             } else {
-                // ·Î±×ÀÎ Ä³½Ã°¡ ¾øÀ½
-                // Auth È­¸é ¶ç¿öÁÖ±â
+                // ë¡œê·¸ì¸ ìºì‹œê°€ ì—†ìŒ
+                // Auth í™”ë©´ ë„ì›Œì£¼ê¸°
                 panelAuth.SetActive(true);
             }
         }
 
         public void GameStart() {
-            // ¸ÞÀÎÈ­¸éÀ¸·Î ³Ñ¾î°¡±â
+            // ë©”ì¸í™”ë©´ìœ¼ë¡œ ë„˜ì–´ê°€ê¸°
         }
     }
 }

@@ -3,5 +3,5 @@ using System.Collections.Generic;
 using UnityEngine;
 
 namespace GodJunie.VTuber.Game {
-    public enum ChatTouchType : int { None = 0, Touch, SwipeLeft, SwipeRight }
+    public enum ChatType : int { None = 0, Normal, Coin, Super, Black }
 }
