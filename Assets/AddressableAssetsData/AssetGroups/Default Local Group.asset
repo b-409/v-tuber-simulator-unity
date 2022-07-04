@@ -20,12 +20,54 @@ MonoBehaviour:
   - m_GUID: 5d7dd525caf3c5e47b0c71e5993245df
     m_Address: Assets/Sprites
     m_ReadOnly: 0
-    m_SerializedLabels: []
+    m_SerializedLabels:
+    - default
   - m_GUID: e0a6300a23df100478188f6a0600dbaf
     m_Address: Assets/Scenes/Main.unity
     m_ReadOnly: 0
     m_SerializedLabels:
     - default
+  - m_GUID: 9b9f95548c3816847a1fa5d8bf20fe79
+    m_Address: Assets/Characters
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - default
+  - m_GUID: 07f044af34d01b544b659e72737f3f9e
+    m_Address: Assets/Characters/Ares
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 29d2458610b6b9849820c1447a083256
+    m_Address: Assets/Characters/Kaylee
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 1bd7a344aa504a242a76af364f8e4799
+    m_Address: Assets/Characters/Mira
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 3812e2ec762cb744cba1983e3c14be2e
+    m_Address: Assets/Characters/Navi
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 72b8c71f0c21a5f4987b98c16df8bf91
+    m_Address: Assets/Characters/Scarlet
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: e9da0206f7995424a8bc1cd7a6bcaba2
+    m_Address: Assets/Characters/Schofield3rd
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 92954eb6c0e16d6469eb0593f84af29b
+    m_Address: Assets/Characters/Sedna
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 0148b20977f2dbe4a9ec01c9c3e03d4e
+    m_Address: Assets/Characters/Springfield
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: cee1ea705353241499866242573234c8
+    m_Address: Assets/Characters/Theo
+    m_ReadOnly: 0
+    m_SerializedLabels: []
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: d9d69a0654ff07b4fbb5759be35fc2d0, type: 2}
   m_SchemaSet:

@@ -15,8 +15,10 @@ using GooglePlayGames;
 using GooglePlayGames.BasicApi;
 // Unity
 using UnityEngine;
+using UnityEngine.SceneManagement;
 // Other
 using Cysharp.Threading.Tasks;
+using Sirenix.OdinInspector;
 
 namespace GodJunie.VTuber {
     public class GameManager : SingletonBehaviour<GameManager> {
@@ -30,11 +32,6 @@ namespace GodJunie.VTuber {
         // Firestore
         private FirebaseFirestore firestore;
 
-
-        //public Action OnSignIn;
-        //public Action OnSignOut;
-
-        
         // Check Firebase Dependency
         // Call this function at start
         public async Task FirebaseInit() {
@@ -87,14 +84,12 @@ namespace GodJunie.VTuber {
                     // Signed out
                     Debug.Log("Signed out " + user.UserId);
                     user = null;
-                    //OnSignOut?.Invoke();
                 }
             } else {
                 if(auth.CurrentUser != user) {
                     // 로그인
                     user = auth.CurrentUser;
                     Debug.Log("Signed in " + user.UserId);
-                    //OnSignIn?.Invoke();
                 }
             }
         }
@@ -107,8 +102,10 @@ namespace GodJunie.VTuber {
             await auth.SignInWithEmailAndPasswordAsync(email, password);
         }
 
-        public async void SignInAnonymously() {
-            await auth.SignInAnonymouslyAsync();
+        public async Task<bool> SignInAnonymously() {
+            var user = await auth.SignInAnonymouslyAsync();
+            if(user != null) return true;
+            return false;
         }
 
         public async Task<bool> SignInWithGoogle() {
@@ -179,7 +176,6 @@ namespace GodJunie.VTuber {
             return FacebookAuthProvider.GetCredential(aToken.TokenString);
         }
 
-
         public void SignOut() {
             //if(MyState != PlayerState.None) {
             //    // 유저 데이터 날리고
@@ -218,6 +214,23 @@ namespace GodJunie.VTuber {
         public async Task<string> GetServerStateAsync() {
             var value = await this.database.Child("management").Child("server-state").GetValueAsync();
             return value.Value as string;
+        }
+        #endregion
+
+        #region Scene Management
+        [SerializeField]
+        [FilePath(AbsolutePath = false)]
+        private string authScenePath;
+        [SerializeField]
+        [FilePath(AbsolutePath = false)]
+        private string mainScenePath;
+
+        public void LoadAuthSceneAsync() {
+            SceneManager.LoadScene(authScenePath);
+        }
+
+        public void LoadMainSceneAsync() {
+            SceneManager.LoadScene(mainScenePath);
         }
         #endregion
     }

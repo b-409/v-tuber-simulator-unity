@@ -1,249 +1,205 @@
-﻿/* 
- * 작성자 : 양준규
- * 최종 수정일 : 2022-02-14
- * 내용 : 
- */
-
-using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
+using TMPro;
 using UnityEngine;
-using Sirenix.OdinInspector;
-using DG.Tweening;
 using UnityEngine.UI;
-using Cysharp.Threading.Tasks;
-
-using Random = UnityEngine.Random;
 
 namespace GodJunie.VTuber.Game {
-    using Data;
-
     public class GameController : MonoBehaviour {
-        #region Serialized Members
-        [TabGroup("group", "Settings")]
-        [LabelText("설정 인스턴스")]
         [SerializeField]
-        private ChatSettings settings;
-
-        [BoxGroup("group/Settings/호감도 게이지")]
-        [LabelText("초기 값")]
+        private ChatBlock chatBlockPrefab;
         [SerializeField]
-        private float gaugeStart;
-        [BoxGroup("group/Settings/호감도 게이지")]
-        [LabelText("최대 값")]
-        [SerializeField]
-        private float gaugeMax;
-        [BoxGroup("group/Settings/호감도 게이지")]
-        [LabelText("게이지 감소량 (초당)")]
-        [SerializeField]
-        private float gaugePerSecond;
-
-        [TabGroup("group", "Settings")]
-        [LabelText("채팅 개수")]
-        [SerializeField]
-        private int chatCount;
-
-        [TabGroup("group", "Settings")]
-        [LabelText("슈퍼 채팅 터치 횟수")]
-        [SerializeField]
-        private int superChatTouchCount;
-
-        // Obejcts
-        // Game Start Menu
-        [TabGroup("group", "Objects")]
-        [TitleGroup("group/Objects/게임 시작")]
-        [SerializeField]
-        [LabelText("게임 시작 패널")]
-        private GameObject panelGameStart;
-
-        // Objects (about game)
-        [TitleGroup("group/Objects/게임")]
-        [SerializeField]
-        [LabelText("채팅 컨테이너")]
         private Transform chatContainer;
-        [TitleGroup("group/Objects/게임")]
         [SerializeField]
-        [LabelText("채팅 프리팹")]
-        private GameObject chatPrefab;
+        private int poolCount;
 
-        [TitleGroup("group/Objects/UI")]
         [SerializeField]
-        [LabelText("구독자 수 텍스트")]
-        private Text textSubscribers;
-        [TitleGroup("group/Objects/UI")]
+        private float startGauge = 50f;
         [SerializeField]
-        [LabelText("코인 텍스트")]
-        private Text textGold;
-        [TitleGroup("group/Objects/UI")]
+        private float deltaGaugeMin = 10f;
         [SerializeField]
-        [LabelText("게이지 이미지")]
-        private Image imageGauge;
-        #endregion
+        private float deltaGaugeMax = 100f;
+        [SerializeField]
+        private AnimationCurve deltaGaugeCurve;
 
-        #region Private Members
-        // 채팅 타이머
-        private float generateTimer;
-        // 구독자 수
-        private int subscribers;
-        // 획득 골드
+        [SerializeField]
+        private float successGauge = 20f;
+        [SerializeField]
+        private int coinChatGold = 1;
+        [SerializeField]
+        private float superChatGauge = 10f;
+
+        [SerializeField]
+        private float badChatRate = 10f;
+        [SerializeField]
+        private float superChatRate = 10f;
+        [SerializeField]
+        private float coinChatRate = 30f;
+        [SerializeField]
+        private float normalChatRate = 50f;
+
+        [SerializeField]
+        private Image imageGaugeFill;
+        [SerializeField]
+        private TMP_Text textScore;
+        [SerializeField]
+        private TMP_Text textGold;
+
+
+        private bool gameStart;
+        private bool isPlaying;
         private int gold;
-        // 호감도 게이지
+        private int score;
         private float gauge;
 
-        private bool isPlaying;
 
-        private List<ChatController> chats = new List<ChatController>();
-        private Dictionary<ChatType, ChatProperties> chatProperties;
+        private Queue<ChatBlock> chatBlockPool;
+        private ChatBlock targetChat;
 
-        private int touchCount;
-        #endregion
-
-        #region MonoBehaviour
-        private void Awake() {
-            chatProperties = settings.ChatProperties;
-        }
 
         // Start is called before the first frame update
         void Start() {
-
+            InitChat();
+            this.gauge = startGauge;
+            this.imageGaugeFill.fillAmount = this.gauge / 100f;
+            gameStart = false;
+            isPlaying = false;
         }
 
         // Update is called once per frame
         void Update() {
             if(isPlaying) {
-                UpdateGauge(-gaugePerSecond * Time.deltaTime);
-                KeyboardInput();
-            }
-        }
-        #endregion
+                this.gauge -= Time.deltaTime * this.deltaGaugeCurve.Evaluate(this.score);
 
-        private void KeyboardInput() {
+                this.imageGaugeFill.fillAmount = this.gauge / 100f;
+
+                if(this.gauge <= 0f) {
+                    this.isPlaying = false;
+                }
+            }
+
             if(Input.GetKeyDown(KeyCode.LeftArrow)) {
-                OnTouchBlack();
+                this.BlackChat();
             }
             if(Input.GetKeyDown(KeyCode.RightArrow)) {
-                OnTouchChat();
+                this.ReadChat();
             }
         }
 
-        private void SetUI() {
-            this.textSubscribers.text = string.Format("구독자 수\n{0}", this.subscribers);
-            this.textGold.text = string.Format("획득 코인\n{0}개", this.gold);
-        }
+        private void InitChat() {
+            chatBlockPool = new Queue<ChatBlock>();
 
-        public void GameStart() {
-            isPlaying = true;
-            this.gauge = gaugeStart;
-            while(chats.Count < chatCount) {
-                GenerateChat();
-            }
-            panelGameStart.SetActive(false);
-        }
-
-        private void OnGameEnd() {
-            isPlaying = false;
-        }
-
-        private void UpdateGauge(float gauge) {
-            this.gauge = Mathf.Clamp(this.gauge + gauge, 0, gaugeMax);
-            imageGauge.fillAmount = this.gauge / this.gaugeMax;
-            if(this.gauge <= 0f) {
-                OnGameEnd();
+            for(int i = 0; i < poolCount; i++) {
+                var chatBlock = Instantiate(chatBlockPrefab, chatContainer);
+                chatBlock.Init("", GetRandChatType());
+                this.chatBlockPool.Enqueue(chatBlock);
             }
         }
 
-        private void GenerateChat() {
-            var rand = Random.Range(0, chatProperties.Sum(e => e.Value.Probs));
-            ChatType type = ChatType.None;
-            foreach(var pair in chatProperties) {
-                if(rand < pair.Value.Probs) {
-                    type = pair.Key;
-                    break;
-                } else {
-                    rand -= pair.Value.Probs;
-                }
+        public void ReadChat() {
+            if(!this.gameStart) {
+                this.gameStart = true;
+                this.isPlaying = true;
             }
 
-            if(type == ChatType.None) {
-                Debug.LogError("타입 지정 실패");
+            if(!this.isPlaying)
                 return;
+
+            if(this.targetChat == null) {
+                this.targetChat = chatBlockPool.Dequeue();
             }
 
-            var properties = chatProperties[type];
-
-            ChatController chat;
-            if(chats.Count < chatCount) {
-                chat = Instantiate(chatPrefab, chatContainer).GetComponent<ChatController>();
-            } else {
-                chat = chats[0];
-                chats.RemoveAt(0);
-            }
-
-            chats.Add(chat);
-            chat.Init(type, properties.BackgroundColor, "");
-            chat.transform.SetSiblingIndex(0);
-        }
-
-
-        private void OnSuccess(ChatController chat) {
-            subscribers += chatProperties[chat.ChatType].SubscribersSuccess;
-            gold += chatProperties[chat.ChatType].GoldSuccess;
-            gauge += chatProperties[chat.ChatType].GaugeSuccess;
-
-            SetUI();
-            GenerateChat();
-        }
-
-        private void OnFail(ChatController chat) {
-            subscribers += chatProperties[chat.ChatType].SubscribersFailed;
-            gold += chatProperties[chat.ChatType].GoldFailed;
-            gauge += chatProperties[chat.ChatType].GaugeFailed;
-
-            SetUI();
-            GenerateChat();
-        }
-
-
-        public void OnTouchChat() {
-            var chat = chats[0];
-
-            switch(chat.ChatType) {
+            switch(this.targetChat.ChatType) {
             case ChatType.Normal:
+                this.GetGauge(successGauge);
+                GetScore(1);
+                RestoreTargetChat();
+                break;
             case ChatType.Coin:
-                // Success
-                OnSuccess(chat);
+                this.GetGauge(successGauge);
+                GetScore(1);
+                GetGold(1);
+                RestoreTargetChat();
                 break;
             case ChatType.Super:
-                touchCount++;
-                if(touchCount == superChatTouchCount) {
-                    // Success
-                    touchCount = 0;
-                    OnSuccess(chat);
+                this.targetChat.ReadSuperChat();
+                if(this.targetChat.TouchCount == 10) {
+                    this.GetGauge(successGauge);
+                    GetScore(10);
+                    GetGold(10);
+                    RestoreTargetChat();
+                } else {
+                    this.GetGauge(this.deltaGaugeCurve.Evaluate(this.score) * 0.1f);
                 }
                 break;
-            case ChatType.Black:
-                // Failed
-                OnFail(chat);
+            case ChatType.Bad:
+                this.GetGauge(-100f);
+                RestoreTargetChat();
                 break;
+            default:
+                throw new System.Exception("Undefined Chat Type");
             }
         }
 
-        public void OnTouchBlack() {
-            var chat = chats[0];
+        public void BlackChat() {
+            if(!this.gameStart) {
+                this.gameStart = true;
+                this.isPlaying = true;
+            }
 
-            switch(chat.ChatType) {
+            if(!this.isPlaying)
+                return;
+
+            if(this.targetChat == null) {
+                this.targetChat = chatBlockPool.Dequeue();
+            }
+
+            switch(this.targetChat.ChatType) {
             case ChatType.Normal:
             case ChatType.Coin:
             case ChatType.Super:
-                // Success
-                OnFail(chat);
+                this.GetGauge(-50f);
                 break;
-            case ChatType.Black:
-                // Failed
-                OnSuccess(chat);
+            case ChatType.Bad:
+                GetScore(1);
+                this.GetGauge(successGauge);
                 break;
+            default:
+                throw new System.Exception("Undefined Chat Type");
             }
+
+            RestoreTargetChat();
+        }
+
+        private void GetGauge(float gauge) {
+            this.gauge = Mathf.Clamp(this.gauge + gauge, 0f, 100f);
+        }
+
+        private void RestoreTargetChat() {
+            this.targetChat.Init("", GetRandChatType());
+            chatBlockPool.Enqueue(this.targetChat);
+            this.targetChat = null;
+        }
+
+        private ChatType GetRandChatType() {
+            float rand = Random.Range(0f, 100f);
+
+            if(rand < badChatRate) return ChatType.Bad;
+            rand -= badChatRate;
+            if(rand < coinChatRate) return ChatType.Coin;
+            rand -= coinChatRate;
+            if(rand < superChatRate) return ChatType.Super;
+            return ChatType.Normal;
+        }
+
+        private void GetScore(int score) {
+            this.score += score;
+            this.textScore.text = this.score.ToString("n0");
+        }
+
+        private void GetGold(int gold) {
+            this.gold += gold;
+            this.textGold.text = this.gold.ToString("n0");
         }
     }
 }

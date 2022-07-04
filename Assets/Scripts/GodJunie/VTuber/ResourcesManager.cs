@@ -31,5 +31,10 @@ namespace GodJunie.VTuber {
 
             return await source.Task;
         }
+
+        public async Task LoadSceneAsync(string path) {
+            var source = new TaskCompletionSource<long>();
+
+        }
     }
 }

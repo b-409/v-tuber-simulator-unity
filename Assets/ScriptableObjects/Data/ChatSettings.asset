@@ -32,7 +32,7 @@ MonoBehaviour:
     gaugeFailed: -300
   superProperties:
     backgroundColor: {r: 1, g: 0.28773582, b: 0.28773582, a: 1}
-    probs: 494
+    probs: 1319
     goldSuccess: 20
     subscribersSuccess: 1
     gaugeSuccess: 100
@@ -41,7 +41,7 @@ MonoBehaviour:
     gaugeFailed: -300
   blackProperties:
     backgroundColor: {r: 0, g: 0, b: 0, a: 1}
-    probs: 385
+    probs: 1758
     goldSuccess: 0
     subscribersSuccess: 0
     gaugeSuccess: 0
